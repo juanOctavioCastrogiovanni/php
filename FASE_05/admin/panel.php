@@ -3,6 +3,10 @@
 	if (isset( $_GET["rta"]) ) {
 		echo MostrarMensaje( $_GET["rta"] );
 	}
+	
+	$pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 0;
+
+	
 ?>
 <h1>Listado de Productos</h1>
 <a href="admin/?page=producto&amp;action=add" class="now-get">Nuevo producto</a>
@@ -20,8 +24,6 @@
 <?php
 
 	//$productos = $conexion->prepare("SELECT * FROM Productos");
-	$productos = $conexion->prepare("SELECT P.idProducto, P.Nombre, P.Precio, P.Presentacion, P.Stock, P.imagen, M.Nombre AS Marca, C.Nombre AS Categoria FROM productos AS P INNER JOIN marcas AS M ON P.Marca = M.idMarca INNER JOIN categorias AS C ON P.Categoria = C.idCategoria");
-	$productos->execute();
-	ListarProductos($productos);
+	
+	ListarProductos($pagina,4); 
 ?>	
-</table>

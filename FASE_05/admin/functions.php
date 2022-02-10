@@ -79,8 +79,25 @@
     	}
     }
 
-	function ListarProductos($productos){
+	function ListarProductos($pagina,$vista){
+		global $conexion;
+
+		$sql = $conexion -> prepare("SELECT COUNT(*) AS total FROM productos");
+		$sql -> execute();
+		$ultima = $sql -> fetch();
+
+		// var_dump($ultima['total']);
+		// die();
+
+		$paginaFinal = $ultima['total'] / $vista;
+		
+		$productos = $conexion->prepare("SELECT P.idProducto, P.Nombre, P.Precio, P.Presentacion, P.Stock, P.imagen, M.Nombre AS Marca, C.Nombre AS Categoria FROM productos AS P INNER JOIN marcas AS M ON P.Marca = M.idMarca INNER JOIN categorias AS C ON P.Categoria = C.idCategoria LIMIT $vista OFFSET " . $pagina * $vista);
+		
+		$productos->execute();
+
+		
 		while ( $producto = $productos->fetch() ) {
+			
 		echo "<tr>";
 			echo "<td>".$producto["Nombre"]."</td>";
 			echo "<td>".$producto["Precio"]."</td>";
@@ -98,7 +115,17 @@
 			echo "<td><a href='admin/?page=producto&amp;action=update&amp;id=". $producto['idProducto'] . "'>Modificar</a></td>";
 			echo "<td><a href='admin/?page=producto&amp;action=delete&amp;id=". $producto['idProducto'] . "'>Eliminar</a></td>";
 		echo "</tr>";
-		}
+	}
+		echo "</table>";
+	
+
+	$despues = $pagina + 1;
+	$antes = $pagina - 1; 
+
+	echo $paginaFinal;
+
+		   if($pagina != 0) { echo "<a href='admin/?page=panel&amp;pagina=". $antes."'>Anterior</a> &nbsp&nbsp&nbsp&nbsp"; } 
+		   if($pagina < $paginaFinal) { echo "<a href='admin/?page=panel&amp;pagina=". $despues."'>Proxima</a>";}
 	}
 
 	//Funciones del Back-End
