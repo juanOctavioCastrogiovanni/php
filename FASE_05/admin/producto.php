@@ -22,8 +22,13 @@
 				$categoria =  $_POST["categoria"];
 				$presentacion =  $_POST["presentacion"];
 				$stock =  $_POST["stock"];
-				
-				CrearProducto($nombre, $precio, $marca, $categoria, $presentacion, $stock);
+				if(isset($_FILES)){
+					$imagen = $_FILES;
+				} else {
+					$imagen = NULL;
+				}
+					
+				CrearProducto($nombre, $precio, $marca, $categoria, $presentacion, $stock, $imagen);
 			break;
 			
 			case 'update':
@@ -34,8 +39,13 @@
 				$categoria =  $_POST["categoria"];
 				$presentacion =  $_POST["presentacion"];
 				$stock =  $_POST["stock"];
+				if(isset($_FILES)){
+					$imagen = $_FILES;
+				} else {
+					$imagen = NULL;
+				}
 				
-				ActualizarProducto($id, $nombre, $precio, $marca, $categoria, $presentacion, $stock);
+				ActualizarProducto($id, $nombre, $precio, $marca, $categoria, $presentacion, $stock, $imagen);
 			break;
 			
 			case 'delete':
@@ -68,7 +78,7 @@
 	}
 ?>
 <div class="main">
-<form action="admin/producto.php?action=<?php echo $action; ?>" method="post">
+<form action="admin/producto.php?action=<?php echo $action; ?>" method="post" enctype="multipart/form-data">
 	Nombre:
 	<br>
 	<input type="text" name="nombre" value="<?php echo $producto["Nombre"]; ?>" <?php echo $status; ?>>
@@ -112,6 +122,9 @@
 	Stock:
 	<br>
 	<input type="text" name="stock" value="<?php echo $producto["Stock"]; ?>" <?php echo $status; ?>>
+	<br>
+	<br>
+	<input type="file" name="imagenProducto">
 	<br>
 	<br>
 	<input type="submit" value="<?php echo $btn; ?>">

@@ -78,12 +78,37 @@
     		}
     	}
     }
+
+	function ListarProductos($productos){
+		while ( $producto = $productos->fetch() ) {
+		echo "<tr>";
+			echo "<td>".$producto["Nombre"]."</td>";
+			echo "<td>".$producto["Precio"]."</td>";
+			echo "<td>".$producto["Marca"]."</td>";
+			echo "<td>".$producto["Categoria"]."</td>";
+			echo "<td>".$producto["Presentacion"]."</td>";
+			echo "<td>".$producto["Stock"]."</td>";
+
+			if($producto["imagen"]){
+				echo "<td><img style='width:20%;' src='" . UPLOAD_PATH . $producto['imagen']. "'></td>";
+			} else {
+				echo "<td><p> Este producto no posee una imagen </p></td>";
+			}
+
+			echo "<td><a href='admin/?page=producto&amp;action=update&amp;id=". $producto['idProducto'] . "'>Modificar</a></td>";
+			echo "<td><a href='admin/?page=producto&amp;action=delete&amp;id=". $producto['idProducto'] . "'>Eliminar</a></td>";
+		echo "</tr>";
+		}
+	}
+
 	//Funciones del Back-End
-	function CrearProducto($nombre, $precio, $marca, $categoria, $presentacion, $stock){
+	function CrearProducto($nombre, $precio, $marca, $categoria, $presentacion, $stock, $imagen){
 		global $conexion;
 		
+		$validacion = validacionImagen($imagen);
+
 		$rta = "0x007";
-		$producto = $conexion->prepare("INSERT INTO productos (Nombre, Precio, Marca, Categoria, Presentacion, Stock) VALUES (:nombre, :precio, :marca, :categoria, :presentacion, :stock)");
+		$producto = $conexion->prepare("INSERT INTO productos (Nombre, Precio, Marca, Categoria, Presentacion, Stock, imagen) VALUES (:nombre, :precio, :marca, :categoria, :presentacion, :stock, :imagen)");
 
 		$producto->bindParam(":nombre", $nombre, PDO::PARAM_STR);
 		$producto->bindParam(":precio", $precio, PDO::PARAM_STR);
@@ -92,15 +117,42 @@
 		$producto->bindParam(":presentacion", $presentacion, PDO::PARAM_STR);
 		$producto->bindParam(":stock", $stock, PDO::PARAM_INT);
 
+		if($validacion){
+			$producto->bindParam(":imagen", $validacion, PDO::PARAM_STR);
+		} else {
+			$producto->bindValue(':imagen', NULL, PDO::PARAM_NULL);
+		}
 		if ( $producto->execute() ) {
 			$rta = "0x006";
 		}
 		header("location: " . BACK_END_URL . "/?rta=" . $rta);
 	}
-	function ActualizarProducto($id, $nombre, $precio, $marca, $categoria, $presentacion, $stock){
+
+	function validacionImagen($imagen){
+		if($imagen['imagenProducto']['name'] == 0){
+			return NULL;
+		}
+		$temporal = $imagen['imagenProducto']['tmp_name'];
+		$nombre = sha1_file($temporal);
+		if(file_exists(UPLOAD_PATH_RELATIVE . $nombre)){
+			return $nombre;
+		}
+		$esImagen = getimagesize($temporal);
+		if($esImagen){
+			if(move_uploaded_file($temporal, UPLOAD_PATH_RELATIVE. $nombre)){
+				return $nombre;
+			}
+		}
+	}
+
+
+	function ActualizarProducto($id, $nombre, $precio, $marca, $categoria, $presentacion, $stock,$imagen){
 		global $conexion;
+
+		$validacion = validacionImagen($imagen);
+
 		$rta = "0x009";
-		$producto = $conexion->prepare("UPDATE productos SET Nombre = :nombre, Precio = :precio, Marca = :marca, Categoria = :categoria, Presentacion = :presentacion, Stock = :stock WHERE idProducto = :id");
+		$producto = $conexion->prepare("UPDATE productos SET Nombre = :nombre, Precio = :precio, Marca = :marca, Categoria = :categoria, Presentacion = :presentacion, Stock = :stock, imagen = :imagen WHERE idProducto = :id");
 					
 		$producto->bindParam(":id", $id, PDO::PARAM_INT);
 		$producto->bindParam(":nombre", $nombre, PDO::PARAM_STR);
@@ -109,12 +161,18 @@
 		$producto->bindParam(":categoria", $categoria, PDO::PARAM_INT);
 		$producto->bindParam(":presentacion", $presentacion, PDO::PARAM_STR);
 		$producto->bindParam(":stock", $stock, PDO::PARAM_INT);
-
+		if($validacion){
+			$producto->bindParam(":imagen", $validacion, PDO::PARAM_STR);
+		} else {
+			$producto->bindValue(':imagen', NULL, PDO::PARAM_NULL);
+		}
 		if ( $producto->execute() ) {
 			$rta = "0x008";
 		}
 		header("location: " . BACK_END_URL . "/?rta=" . $rta);
 	}
+
+
 	function BorrarProducto($id){
 		global $conexion;
 		$rta = "0x011";

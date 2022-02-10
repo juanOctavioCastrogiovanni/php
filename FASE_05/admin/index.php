@@ -7,7 +7,7 @@
 	require_once("functions.php");
 	include("../header.php");
 ?>
-<section id="page">
+<section <?php echo $page!="panel" ? "id='page'" : "" ?>>
 	
 	<?php 
 	CargarPagina( $page ); ?>
