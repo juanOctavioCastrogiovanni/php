@@ -50,7 +50,11 @@
 			
 			case 'delete':
 				$id = $_POST["id"];
-				BorrarProducto($id);
+		
+				
+				var_dump($_POST);
+				die();
+				BorrarProducto($id,$imagen);
 			break;
 		}
 	} else {
@@ -73,6 +77,8 @@
 				$btn = "Eliminar";
 				$status = "disabled";
 				$producto = ObtenerProducto( $id );
+				// var_dump($producto);
+				// die();
 			break;
 		}
 	}
@@ -122,6 +128,11 @@
 	Stock:
 	<br>
 	<input type="text" name="stock" value="<?php echo $producto["Stock"]; ?>" <?php echo $status; ?>>
+	<?php
+		if(isset($producto["imagen"])){
+			echo "<input type='hidden' name='imagen' value='".$producto['imagen'].">";
+		}
+	?>
 	<br>
 	<br>
 	<input type="file" name="imagenProducto">

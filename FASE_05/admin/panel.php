@@ -6,10 +6,15 @@
 	
 	$pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 0;
 
+	require "./conexion.php";
+
+	
 	
 ?>
 <h1>Listado de Productos</h1>
+
 <a href="admin/?page=producto&amp;action=add" class="now-get">Nuevo producto</a>
+
 <table>
 	<tr>
 		<th>Nombre</th>
@@ -25,5 +30,5 @@
 
 	//$productos = $conexion->prepare("SELECT * FROM Productos");
 	
-	ListarProductos($pagina,4); 
+	ListarProductos($pagina,2); 
 ?>	

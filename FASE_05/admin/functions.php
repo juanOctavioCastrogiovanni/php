@@ -82,22 +82,22 @@
 	function ListarProductos($pagina,$vista){
 		global $conexion;
 
-		$sql = $conexion -> prepare("SELECT COUNT(*) AS total FROM productos");
-		$sql -> execute();
-		$ultima = $sql -> fetch();
-
 		// var_dump($ultima['total']);
 		// die();
 
-		$paginaFinal = $ultima['total'] / $vista;
-		
+		$cantidad = $conexion->prepare("SELECT COUNT(*) FROM productos");
+
+		$cantidad->execute();
+
+		$cant = (int)($cantidad->fetch())[0];
+				
 		$productos = $conexion->prepare("SELECT P.idProducto, P.Nombre, P.Precio, P.Presentacion, P.Stock, P.imagen, M.Nombre AS Marca, C.Nombre AS Categoria FROM productos AS P INNER JOIN marcas AS M ON P.Marca = M.idMarca INNER JOIN categorias AS C ON P.Categoria = C.idCategoria LIMIT $vista OFFSET " . $pagina * $vista);
 		
 		$productos->execute();
 
-		
-		while ( $producto = $productos->fetch() ) {
-			
+		$productoss = $productos->fetchAll(PDO::FETCH_ASSOC);
+
+		foreach ($productoss as $producto) {
 		echo "<tr>";
 			echo "<td>".$producto["Nombre"]."</td>";
 			echo "<td>".$producto["Precio"]."</td>";
@@ -114,18 +114,55 @@
 
 			echo "<td><a href='admin/?page=producto&amp;action=update&amp;id=". $producto['idProducto'] . "'>Modificar</a></td>";
 			echo "<td><a href='admin/?page=producto&amp;action=delete&amp;id=". $producto['idProducto'] . "'>Eliminar</a></td>";
+
 		echo "</tr>";
 	}
 		echo "</table>";
+
+		$cantpag = pag($cant,$vista);
+
+		if($cant != $vista){
+		MostrarPaginador($pagina,$cantpag);
+		}
+	}
+
+
+
+
+
+	function pag($productos,$vistas){
+		$num = (int)($productos/$vistas);
+		if($productos%$vistas != 0){
+			$num++; 
+		}
+
+		return $num - 1;
+	}
+
+
+
 	
+	function MostrarPaginador($paginaActual, $cantidadDePaginas){
+		
+		$despues = $paginaActual + 1;
+		$antes = $paginaActual - 1; 
 
-	$despues = $pagina + 1;
-	$antes = $pagina - 1; 
+		if ($paginaActual > 0){
+		echo "<a style='text-decoration:none;' href='admin/?page=panel&amp;pagina=". $antes."'>Anterior&nbsp&nbsp&nbsp&nbsp</a>";
+		}		
+		$j = 1;
+		for ($i = 0; $i <= $cantidadDePaginas; $i++){
+			if($i == $paginaActual){
+				echo "<a style='text-decoration:none;' href='admin/?page=panel&amp;pagina=". $i."'><strong>$j</strong>&nbsp&nbsp</a>";
+			} else {
+				echo "<a style='text-decoration:none;' href='admin/?page=panel&amp;pagina=". $i."'>$j&nbsp&nbsp</a>";
+			}
 
-	echo $paginaFinal;
-
-		   if($pagina != 0) { echo "<a href='admin/?page=panel&amp;pagina=". $antes."'>Anterior</a> &nbsp&nbsp&nbsp&nbsp"; } 
-		   if($pagina < $paginaFinal) { echo "<a href='admin/?page=panel&amp;pagina=". $despues."'>Proxima</a>";}
+			$j++;
+		}
+		if($cantidadDePaginas > $paginaActual){
+		echo "<a style='text-decoration:none;' href='admin/?page=panel&amp;pagina=". $despues."'>&nbsp&nbsp&nbspProxima</a>";
+		}
 	}
 
 	//Funciones del Back-End
@@ -221,7 +258,8 @@
 			"Marca" => "",
 			"Categoria" => "",
 			"Presentacion" => "",
-			"Stock" => ""
+			"Stock" => "",
+			"imagen" => ""
 		);
 		if( $id != 0 ) {
 			global $conexion;
