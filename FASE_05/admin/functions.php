@@ -54,7 +54,11 @@
 
 			case '0x011':
 				$mensaje = "Error al eliminar el producto";
-			break;					
+			break;	
+			
+			case '0x012':
+				$mensaje = "Error al eliminar la foto anterior";
+			break;	
 		}
 		return "<p class='rta rta-".$cod."'>".$mensaje."</p>";
 	}
@@ -126,10 +130,6 @@
 		}
 	}
 
-
-
-
-
 	function pag($productos,$vistas){
 		$num = (int)($productos/$vistas);
 		if($productos%$vistas != 0){
@@ -139,11 +139,7 @@
 		return $num - 1;
 	}
 
-
-
-	
 	function MostrarPaginador($paginaActual, $cantidadDePaginas){
-		
 		$despues = $paginaActual + 1;
 		$antes = $paginaActual - 1; 
 
@@ -151,6 +147,7 @@
 		echo "<a style='text-decoration:none;' href='admin/?page=panel&amp;pagina=". $antes."'>Anterior&nbsp&nbsp&nbsp&nbsp</a>";
 		}		
 		$j = 1;
+
 		for ($i = 0; $i <= $cantidadDePaginas; $i++){
 			if($i == $paginaActual){
 				echo "<a style='text-decoration:none;' href='admin/?page=panel&amp;pagina=". $i."'><strong>$j</strong>&nbsp&nbsp</a>";
@@ -160,6 +157,7 @@
 
 			$j++;
 		}
+
 		if($cantidadDePaginas > $paginaActual){
 		echo "<a style='text-decoration:none;' href='admin/?page=panel&amp;pagina=". $despues."'>&nbsp&nbsp&nbspProxima</a>";
 		}
@@ -168,9 +166,7 @@
 	//Funciones del Back-End
 	function CrearProducto($nombre, $precio, $marca, $categoria, $presentacion, $stock, $imagen){
 		global $conexion;
-		
 		$validacion = validacionImagen($imagen);
-
 		$rta = "0x007";
 		$producto = $conexion->prepare("INSERT INTO productos (Nombre, Precio, Marca, Categoria, Presentacion, Stock, imagen) VALUES (:nombre, :precio, :marca, :categoria, :presentacion, :stock, :imagen)");
 
@@ -207,10 +203,11 @@
 				return $nombre;
 			}
 		}
+
+		return FALSE;
 	}
-
-
-	function ActualizarProducto($id, $nombre, $precio, $marca, $categoria, $presentacion, $stock,$imagen){
+		
+		function ActualizarProducto($id, $nombre, $precio, $marca, $categoria, $presentacion, $stock, $nombreAnterior ,$imagen){
 		global $conexion;
 
 		$validacion = validacionImagen($imagen);
@@ -233,11 +230,17 @@
 		if ( $producto->execute() ) {
 			$rta = "0x008";
 		}
+		
+		if(!borrarImagen($nombreAnterior)){
+			$rta = "0x012";
+		}
+
+	
 		header("location: " . BACK_END_URL . "/?rta=" . $rta);
 	}
 
 
-	function BorrarProducto($id){
+	function BorrarProducto($id,$imagen){
 		global $conexion;
 		$rta = "0x011";
 		$id = $_POST["id"];
@@ -246,10 +249,26 @@
 		$producto->bindParam(":id", $id, PDO::PARAM_INT);
 
 		if ( $producto->execute() ) {
-			$rta = "0x010";
+			$rta = borrarImagen($imagen);
 		}
+
+
 		header("location: " . BACK_END_URL . "/?rta=" . $rta);
 	}
+
+	function borrarImagen($i){
+		if($i != ""){
+			if(unlink(UPLOAD_PATH_RELATIVE.$i)){
+				return "0x010";
+			} else {
+				return "0x011";
+			}
+		} 
+
+		return "0x010";
+
+	}
+
 	function ObtenerProducto($id = 0){
 		$producto = array(
 			"idProducto" => "",

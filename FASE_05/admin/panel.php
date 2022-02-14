@@ -30,5 +30,5 @@
 
 	//$productos = $conexion->prepare("SELECT * FROM Productos");
 	
-	ListarProductos($pagina,2); 
+	ListarProductos($pagina,5); 
 ?>	

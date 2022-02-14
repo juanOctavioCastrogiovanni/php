@@ -44,16 +44,18 @@
 				} else {
 					$imagen = NULL;
 				}
+
+				$imagenAntigua = $conexion->prepare("SELECT imagen FROM productos WHERE idProducto=:id");
+				$imagenAntigua -> bindValue(':id',$id);
+				$imagenAntigua->execute();
 				
-				ActualizarProducto($id, $nombre, $precio, $marca, $categoria, $presentacion, $stock, $imagen);
+				$nombreAnterior = ($imagenAntigua->fetch())['imagen'];		
+				ActualizarProducto($id, $nombre, $precio, $marca, $categoria, $presentacion, $stock, $nombreAnterior ,$imagen);
 			break;
 			
 			case 'delete':
 				$id = $_POST["id"];
-		
-				
-				var_dump($_POST);
-				die();
+				$imagen = isset($_POST['imagen']) ? $_POST['imagen'] : "";				
 				BorrarProducto($id,$imagen);
 			break;
 		}
@@ -77,8 +79,6 @@
 				$btn = "Eliminar";
 				$status = "disabled";
 				$producto = ObtenerProducto( $id );
-				// var_dump($producto);
-				// die();
 			break;
 		}
 	}
@@ -130,7 +130,7 @@
 	<input type="text" name="stock" value="<?php echo $producto["Stock"]; ?>" <?php echo $status; ?>>
 	<?php
 		if(isset($producto["imagen"])){
-			echo "<input type='hidden' name='imagen' value='".$producto['imagen'].">";
+			echo "<input type='hidden' name='imagen' value='".$producto['imagen']."'>";
 		}
 	?>
 	<br>
