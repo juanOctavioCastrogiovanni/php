@@ -17,13 +17,13 @@
 
 <table>
 	<tr>
+		<th>Imagen</th>
 		<th>Nombre</th>
 		<th>Precio</th>
 		<th>Marca</th>
 		<th>Categoria</th>
 		<th>Presentacion</th>
 		<th>Stock</th>
-		<th>Imagen</th>
 		<th colspan="2">Acciones</th>
 	</tr>
 <?php

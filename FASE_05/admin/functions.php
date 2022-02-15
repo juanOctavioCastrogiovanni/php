@@ -1,5 +1,5 @@
+include("conexion.php");
 <?php
-	include("conexion.php");
 	
 	function CargarPagina($pagina){
 		$modulo = "./" . $pagina . ".php"; 
@@ -59,6 +59,18 @@
 			case '0x012':
 				$mensaje = "Error al eliminar la foto anterior";
 			break;	
+
+			case '0x013':
+				$mensaje = "El mail ya se encuentra registrado";
+			break;
+
+			case '0x014':
+				$mensaje = "Se ha enviado un correo a su casilla de correo electronico. Por favor active su cuenta";
+			break;
+
+			case '0x015':
+				$mensaje = "Error";
+			break;
 		}
 		return "<p class='rta rta-".$cod."'>".$mensaje."</p>";
 	}
@@ -103,6 +115,11 @@
 
 		foreach ($productoss as $producto) {
 		echo "<tr>";
+			if($producto["imagen"]){
+				echo "<td style='width:20%;'><img style='width:70%;' src='" . UPLOAD_PATH . $producto['imagen']. "'></td>";
+			} else {
+				echo "<td><p> Este producto no posee una imagen </p></td>";
+			}
 			echo "<td>".$producto["Nombre"]."</td>";
 			echo "<td>".$producto["Precio"]."</td>";
 			echo "<td>".$producto["Marca"]."</td>";
@@ -110,11 +127,6 @@
 			echo "<td>".$producto["Presentacion"]."</td>";
 			echo "<td>".$producto["Stock"]."</td>";
 
-			if($producto["imagen"]){
-				echo "<td><img style='width:20%;' src='" . UPLOAD_PATH . $producto['imagen']. "'></td>";
-			} else {
-				echo "<td><p> Este producto no posee una imagen </p></td>";
-			}
 
 			echo "<td><a href='admin/?page=producto&amp;action=update&amp;id=". $producto['idProducto'] . "'>Modificar</a></td>";
 			echo "<td><a href='admin/?page=producto&amp;action=delete&amp;id=". $producto['idProducto'] . "'>Eliminar</a></td>";
@@ -290,5 +302,79 @@
 			}
 		}
 		return $producto;
+	}
+
+	function registrarUsuario($usuario){
+		if(validacionUsuario($usuario['email'])){
+            header("location: ./?page=registro&rta=0x013");
+        } else if(validacionUsuario($usuario['email']) === NULL){
+            echo "Problema con la peticion a la base de datos";
+        } else {
+            crearNuevoUsuario($usuario, 0);
+        }
+	}
+
+	function crearNuevoUsuario($usuario,$estado){
+		global $conexion;
+
+		if($estado==0){
+			$usuarios = $conexion->prepare("INSERT INTO usuarios (Nombre, Apellido, Email, Pass, Activacion, Estado) VALUES (:nombre, :apellido, :email, :pass, :activacion, :estado)");
+			$contraseña = password_hash($usuario['Pass'],PASSWORD_DEFAULT, ['cost']=>10);
+
+			//usar password_verify($password,$hash); para verificarlo
+
+			$usuarios->bindParam(":nombre", $usuario['Nombre'], PDO::PARAM_STR);
+			$usuarios->bindParam(":apellido", $usuario['Apellido'], PDO::PARAM_STR);
+			$usuarios->bindParam(":email", $usuario['Email'], PDO::PARAM_INT);
+			$usuarios->bindParam(":pass", $contraseña, PDO::PARAM_INT);
+			$usuarios->bindParam(":activacion", $usuario['Activacion'], PDO::PARAM_STR);
+			$usuarios->bindParam(":estado", $estado , PDO::PARAM_INT);
+
+			if ( $usuarios->execute() ) {
+				$cuerpo = "<h1>ComercioIT - Datos de contacto</h1>";
+				$cuerpo.= "<p><strong>Nombre:</strong> " . $usuario['Nombre'] . "</p>";
+				$cuerpo.= "<p><strong>E-Mail:</strong> " .  $usuario['Email'] . "</p>";
+				$cuerpo.= "<p><strong>Por favor da click en el boton del enlace con el codigo de activacion</strong></p>";
+				$cuerpo.= "<p><strong>Mensaje:</strong></p>";
+
+				//3) Construir la cabecera del email
+				$cabecera = "From: contacto@comercioit.com\r\n";
+				$cabecera.= "MIME-Version: 1.0\r\n";
+				$cabecera.= "Content-Type: text/html; charset=UTF-8\r\n";
+
+				$destinatario = $usuario['Email'];
+
+				$asunto = "Contacto desde ComercioIT";
+
+				//4) Enviar el email
+				if ( mail($destinatario, $asunto, $cuerpo, $cabecera) === true ) {
+					//echo "E-Mail enviado";
+					header("location: ./?page=registro&rta=0x014");
+				} else {
+					//echo "E-Mail no enviado";
+					header("location: ./?page=registro&rta=0x015");
+				}
+			}
+		} else {
+			header("location: ./?page=registro&rta=0x015");
+		}
+		header("location: " . BACK_END_URL . "/?rta=" . $rta);
+	}
+
+	function validacionUsuario($email){
+		global $conexion;
+		$listaUsuarios = $conexion->prepare("SELECT * FROM usuarios");
+		if($listaUsuarios->execute()){
+			$usuarios = $listaUsuarios -> fetchAll();
+			foreach($usuarios as $usuario){
+				if($usuario['Email'] == $email){
+					return TRUE;
+				}
+			}
+
+			return False;
+		} 
+
+		return NULL;
 	}
 ?>

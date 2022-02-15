@@ -33,9 +33,9 @@
 							<a href="ingreso.html"><span></span> TU CUENTA</a>
 						</div-->
 						<ul class="login">
-							<li><a href="?page=ingreso"><span></span> INGRESAR</a></li>
+							<li><a href="./admin/?page=ingreso"><span></span> INGRESAR</a></li>
 							&nbsp;|&nbsp;
-							<li><a href="?page=registro">REGISTRARME</a></li>
+							<li><a href="./admin/?page=registro">REGISTRARME</a></li>
 							&nbsp;|&nbsp;
 							<li><a href="?page=contacto">CONTACTO</a></li>
 						</ul>
