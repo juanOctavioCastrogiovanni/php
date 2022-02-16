@@ -33,9 +33,16 @@
 							<a href="ingreso.html"><span></span> TU CUENTA</a>
 						</div-->
 						<ul class="login">
-							<li><a href="./admin/?page=ingreso"><span></span> INGRESAR</a></li>
-							&nbsp;|&nbsp;
-							<li><a href="./admin/?page=registro">REGISTRARME</a></li>
+							<?php
+								if(isset($_SESSION)){
+									echo "abierta";
+									echo "<li><a href='?page=contacto'>Bienvenido".$_SESSION['Nombre']."</a></li>";
+								} else {
+									echo "cerrada";
+									echo "<li><a href='./admin/?page=ingreso'><span></span> INGRESAR</a></li>&nbsp;|&nbsp;";
+									echo "<li><a href='./admin/?page=registro'>REGISTRARTE</a></li>";
+								}
+							?>
 							&nbsp;|&nbsp;
 							<li><a href="?page=contacto">CONTACTO</a></li>
 						</ul>

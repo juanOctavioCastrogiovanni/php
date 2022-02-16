@@ -9,6 +9,7 @@ include("conexion.php");
 			include( "404.php" );
 		}
 	}
+
 	function MostrarMensaje($cod){
 
 		switch ($cod) {
@@ -70,6 +71,18 @@ include("conexion.php");
 
 			case '0x015':
 				$mensaje = "Error";
+			break;
+
+			case '0x019':
+				$mensaje = "No coincide clave con contraseña";
+			break;
+
+			case '0x020':
+				$mensaje = "Se ha iniciado sesion";
+			break;
+
+			case '0x021':
+				$mensaje = "Se ha cerrado sesion correctamente";
 			break;
 		}
 		return "<p class='rta rta-".$cod."'>".$mensaje."</p>";
@@ -310,7 +323,7 @@ include("conexion.php");
         } else if(validacionUsuario($usuario['email']) === NULL){
             echo "Problema con la peticion a la base de datos";
         } else {
-            crearNuevoUsuario(0,$usuario);
+            crearNuevoUsuario(0,NULL,$usuario);
         }
 	}
 
@@ -319,10 +332,7 @@ include("conexion.php");
 
 		if($estado==0){
 			$usuarios = $conexion->prepare("INSERT INTO usuarios (Nombre, Apellido, Email, Pass, Activacion, Estado) VALUES (:nombre, :apellido, :email, :pass, :activacion, :estado)");
-			
-			
-			
-			$contraseña = password_hash($usuario['pass'] , PASSWORD_DEFAULT , [
+			$contrasenia = password_hash($usuario['pass'] , PASSWORD_DEFAULT , [
 				'cost' => 10]);
 			
 			$activacion = chr(random_int(65, 90)) . random_int(1000, 9999);
@@ -334,17 +344,17 @@ include("conexion.php");
 			$usuarios->bindValue(":nombre", $usuario['nombre']);
 			$usuarios->bindValue(":apellido", $usuario['apellido']);
 			$usuarios->bindValue(":email", $usuario['email']);
-			$usuarios->bindValue(":pass", $contraseña);
+			$usuarios->bindValue(":pass", $contrasenia);
 			$usuarios->bindValue(":activacion", $activacion);
 			$usuarios->bindValue(":estado", $estado); 
 
 			if ( $usuarios->execute() ) {
-//usuario.php?u=pedroelEscamoso@sdf&k=G9484&action=activeUser
+//usuario.php?u=GC@hotmail.com&k=P9500&action=activeUser
 				$cuerpo = "<h1>ComercioIT - Datos de contacto</h1>";
-				$cuerpo.= "<p><strong>Nombre:</strong> " . $usuario['Nombre'] . "</p>";
-				$cuerpo.= "<p><strong>E-Mail:</strong> " .  $usuario['Email'] . "</p>";
+				$cuerpo.= "<p><strong>Nombre:</strong> " . $usuario['nombre'] . "</p>";
+				$cuerpo.= "<p><strong>E-Mail:</strong> " .  $usuario['email'] . "</p>";
 				$cuerpo.= "<p><strong>Por favor da click en el boton del enlace con el codigo de activacion</strong></p>";
-				$cuerpo.= "<p><strong><a href='usuario.php?u=".$usuario['Email']."&k=$activacion&action=activeUser'</strong></p>";
+				$cuerpo.= "<p><strong><a href='usuario.php?u=".$usuario['email']."&k=$activacion&action=activeUser'</strong></p>";
 
 				//3) Construir la cabecera del email
 				$cabecera = "From: contacto@comercioit.com\r\n";
@@ -367,18 +377,29 @@ include("conexion.php");
 				header("location: ./?page=registro&rta=0x015");
 			}
 
-		} else {
-			activarUsuario($email);
+		} else if($estado==1){
+			if(activarUsuario($email)){
+				FALTA RECUPERAR EL USUARIO PARA SACAR LOS DATOS NOMBRE, APELLIDO Y MAIL
+				return array('nombre' => $usuario['nombre'],
+							'apellido' => $usuario['apellido'],
+							'email' => $usuario['email']);
+			}
 		}
 	}
 
-	function validacionUsuario($email){
+	function validarContrasenia($hash, $contrasenia){
+		return password_verify($contrasenia,$hash);
+	}
+
+	function validacionUsuario($email,$contrasenia = NULL){
 		global $conexion;
 		$listaUsuarios = $conexion->prepare("SELECT * FROM usuarios");
 		if($listaUsuarios->execute()){
 			$usuarios = $listaUsuarios -> fetchAll();
 			foreach($usuarios as $usuario){
-				if($usuario['Email'] == $email){
+				if($usuario['Email'] == $email&&$contrasenia){
+					return validaContrasenia($usuario['pass'],$contrasenia) ? TRUE : FALSE;
+				} else if ($usuario['Email'] == $email){
 					return TRUE;
 				}
 			}
@@ -396,9 +417,27 @@ include("conexion.php");
 		$usuario -> bindValue(":email", $email);
 
 		if($usuario -> execute()){
-			echo "Usuario activado";
-		} else {
-			echo "Problema con la base de datos";
-		}
+			return TRUE;
+		} 
+
+		return FALSE;
+	}
+
+	function iniciarSecion($email,$contrasenia){
+		return validacionUsuario($email,$contrasenia);
+	}
+
+	function validarSesion($bandera){
+		if($bandera){
+			header("location: ./?page=panel");
+		} 
+	}
+
+	function crearSession($nombre,$apellido,$email){
+		session_start();
+
+        $_SESSION['Nombre'] = $nombre; 
+        $_SESSION['Apellido'] = $apellido; 
+        $_SESSION['Email'] = $email;
 	}
 ?>

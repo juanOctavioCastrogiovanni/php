@@ -1,3 +1,8 @@
+<?php
+	if(isset($_SESSION)){
+		validarSesion(TRUE);
+	}
+?>
 <div class="account_grid">
 	<div class="login-right">
 		<h3>INGRESO DE USUARIO</h3>
