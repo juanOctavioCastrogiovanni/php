@@ -17,11 +17,11 @@ require "./functions.php";
 
     if(isset($_GET['u'])){
             $datos = crearNuevoUsuario(1,$_GET['u'],NULL);
-            crearSession($datos['nombre'],$datos['apellido'],$datos['email']);
+            crearSession($datos['nombre'], $datos['apellido'], $datos['email']);
             header("location: ./?page=panel&rta=0x020");
     }    
 
-    if(isset($_GET['e'])){
+    if(isset($_GET['exit'])&&$_GET['exit'] == "exit"){
         setcookie(session_name(),NULL);
 
         session_unset();
@@ -29,3 +29,5 @@ require "./functions.php";
     }
     
 ?>
+
+REVISAR CERRAR SESSION ERROR

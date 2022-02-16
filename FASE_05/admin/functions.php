@@ -379,10 +379,16 @@ include("conexion.php");
 
 		} else if($estado==1){
 			if(activarUsuario($email)){
-				FALTA RECUPERAR EL USUARIO PARA SACAR LOS DATOS NOMBRE, APELLIDO Y MAIL
-				return array('nombre' => $usuario['nombre'],
-							'apellido' => $usuario['apellido'],
-							'email' => $usuario['email']);
+				// FALTA RECUPERAR EL USUARIO PARA SACAR LOS DATOS NOMBRE, APELLIDO Y MAIL
+				$usuarioo = $conexion->prepare("SELECT * FROM usuarios where email = :email");
+				$usuarioo -> bindValue(":email", $email);
+				$usuarioo -> execute();
+				$usuario = $usuarioo -> fetch();
+				
+				
+				return array('nombre' => $usuario['Nombre'],
+							'apellido' => $usuario['Apellido'],
+							'email' => $usuario['Email']);
 			}
 		}
 	}
@@ -435,9 +441,9 @@ include("conexion.php");
 
 	function crearSession($nombre,$apellido,$email){
 		session_start();
-
         $_SESSION['Nombre'] = $nombre; 
         $_SESSION['Apellido'] = $apellido; 
         $_SESSION['Email'] = $email;
+		
 	}
 ?>

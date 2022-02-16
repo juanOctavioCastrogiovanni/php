@@ -34,11 +34,12 @@
 						</div-->
 						<ul class="login">
 							<?php
+								session_start();
+
 								if(isset($_SESSION)){
-									echo "abierta";
-									echo "<li><a href='?page=contacto'>Bienvenido".$_SESSION['Nombre']."</a></li>";
+									echo "<li><a href='admin/?page=panel'>Bienvenido ".$_SESSION['Nombre']."</a></li>&nbsp;|&nbsp;";
+									echo "<li><a href='admin/?page=usuario&exit=exit'>CERRAR SESION</a></li>";
 								} else {
-									echo "cerrada";
 									echo "<li><a href='./admin/?page=ingreso'><span></span> INGRESAR</a></li>&nbsp;|&nbsp;";
 									echo "<li><a href='./admin/?page=registro'>REGISTRARTE</a></li>";
 								}
