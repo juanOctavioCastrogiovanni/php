@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-02-2022 a las 19:39:09
+-- Tiempo de generación: 16-02-2022 a las 16:07:53
 -- Versión del servidor: 10.1.34-MariaDB
 -- Versión de PHP: 7.2.7
 
@@ -107,7 +107,7 @@ INSERT INTO `productos` (`idProducto`, `Nombre`, `Precio`, `Marca`, `Categoria`,
 (5, 'Moto G', 489.99, 5, 2, '8GB', 750, NULL),
 (6, 'L40', 199.69, 4, 2, '24GB', 350, NULL),
 (8, 'IPHONE X', 31231, 1, 2, '123GB', 13213, NULL),
-(21, '', 0, 2, 3, '', 0, '2e49c5db415d65ede47fded6272adeec6b4a6e14');
+(21, '', 0, 2, 3, '', 0, '82cd2365fb500a3f95f862a77205efd6d361d774');
 
 -- --------------------------------------------------------
 
@@ -124,6 +124,20 @@ CREATE TABLE `usuarios` (
   `Activacion` text NOT NULL,
   `Estado` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`idUsuario`, `Nombre`, `Apellido`, `Email`, `Pass`, `Activacion`, `Estado`) VALUES
+(1, 'Pedro', 'El escamoso', 'pedroelEscamoso@yaho', '$2y$10$jg8x0SoMOpfRgxBwd2nMZeaBkMNAEgc6qUg8N22c.BTR5UlPD6zWu', 'G9484', 0),
+(4, 'Pedro', 'El escamoso', 'pedroelEscamoso@sdf', '$2y$10$jg8x0SoMOpfRgxBwd2nMZeaBkMNAEgc6qUg8N22c.BTR5UlPD6zWu', 'G9484', 1),
+(5, 'Pedro', 'El escamoso', 'peasdf@asdf.com', '$2y$10$jg8x0SoMOpfRgxBwd2nMZeaBkMNAEgc6qUg8N22c.BTR5UlPD6zWu', 'G9484', 1),
+(6, 'Pedro', 'El escamoso', 'asdfasdf@yahoo.com', '$2y$10$PfsO/Rf1l3Fup6huOAiQ6eYd.b64wrLv4kYgQw8u8zVy8RwJ3U/M.', 'P5482', 0),
+(7, 'asdfa', 'sdfasdf', 'asdfa', '$2y$10$I9rbkdljQZUmqV3wEAPKB.NVf3KQvGJ1mBfAGQd8lWhtNUCcUVdyG', 'X4776', 0),
+(8, 'asdfa', 'sdfasdf', 'qwer3', '$2y$10$S7GTEfpwWSCamMeoDG8fbu1Pf8SNZspPjkezbddS/M6w40u.NEup6', 'R4936', 0),
+(9, 'fasdfasd', 'fasdfasdf', 'wertncvnb', '$2y$10$7AMHmemZ8vlulFGxg1VIDuN9mam5XcrY/GpePKUxoUncfaUd.wIrm', 'O3267', 0),
+(10, 'sdfgsdfg', 'dfgsdfgsdf', '34tgzsd', '$2y$10$ULA.G4T0NfeDWAgSTeJRc.l.J8OboEGHzbCni/.2w7lxVHxChfCdq', 'U1327', 0);
 
 --
 -- Índices para tablas volcadas
@@ -154,7 +168,7 @@ ALTER TABLE `productos`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`idUsuario`),
-  ADD UNIQUE KEY `Email` (`Email`) USING BTREE;
+  ADD UNIQUE KEY `Email` (`Email`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -177,6 +191,12 @@ ALTER TABLE `marcas`
 --
 ALTER TABLE `productos`
   MODIFY `idProducto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `idUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Restricciones para tablas volcadas

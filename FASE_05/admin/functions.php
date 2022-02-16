@@ -1,5 +1,5 @@
-include("conexion.php");
 <?php
+include("conexion.php");
 	
 	function CargarPagina($pagina){
 		$modulo = "./" . $pagina . ".php"; 
@@ -310,32 +310,41 @@ include("conexion.php");
         } else if(validacionUsuario($usuario['email']) === NULL){
             echo "Problema con la peticion a la base de datos";
         } else {
-            crearNuevoUsuario($usuario, 0);
+            crearNuevoUsuario(0,$usuario);
         }
 	}
 
-	function crearNuevoUsuario($usuario,$estado){
+	function crearNuevoUsuario($estado, $email = NULL, $usuario = NULL){
 		global $conexion;
 
 		if($estado==0){
 			$usuarios = $conexion->prepare("INSERT INTO usuarios (Nombre, Apellido, Email, Pass, Activacion, Estado) VALUES (:nombre, :apellido, :email, :pass, :activacion, :estado)");
-			$contraseña = password_hash($usuario['Pass'],PASSWORD_DEFAULT, ['cost']=>10);
-
+			
+			
+			
+			$contraseña = password_hash($usuario['pass'] , PASSWORD_DEFAULT , [
+				'cost' => 10]);
+			
+			$activacion = chr(random_int(65, 90)) . random_int(1000, 9999);
+			
 			//usar password_verify($password,$hash); para verificarlo
 
-			$usuarios->bindParam(":nombre", $usuario['Nombre'], PDO::PARAM_STR);
-			$usuarios->bindParam(":apellido", $usuario['Apellido'], PDO::PARAM_STR);
-			$usuarios->bindParam(":email", $usuario['Email'], PDO::PARAM_INT);
-			$usuarios->bindParam(":pass", $contraseña, PDO::PARAM_INT);
-			$usuarios->bindParam(":activacion", $usuario['Activacion'], PDO::PARAM_STR);
-			$usuarios->bindParam(":estado", $estado , PDO::PARAM_INT);
+			// INSERT INTO usuarios (Nombre, Apellido, Email, Pass, Activacion, Estado) VALUES ("Pedro" , "El escamoso", "pedroelEscamoso@yahoo.com", "$2y$10$jg8x0SoMOpfRgxBwd2nMZeaBkMNAEgc6qUg8N22c.BTR5UlPD6zWu", "G9484", 0)
+
+			$usuarios->bindValue(":nombre", $usuario['nombre']);
+			$usuarios->bindValue(":apellido", $usuario['apellido']);
+			$usuarios->bindValue(":email", $usuario['email']);
+			$usuarios->bindValue(":pass", $contraseña);
+			$usuarios->bindValue(":activacion", $activacion);
+			$usuarios->bindValue(":estado", $estado); 
 
 			if ( $usuarios->execute() ) {
+//usuario.php?u=pedroelEscamoso@sdf&k=G9484&action=activeUser
 				$cuerpo = "<h1>ComercioIT - Datos de contacto</h1>";
 				$cuerpo.= "<p><strong>Nombre:</strong> " . $usuario['Nombre'] . "</p>";
 				$cuerpo.= "<p><strong>E-Mail:</strong> " .  $usuario['Email'] . "</p>";
 				$cuerpo.= "<p><strong>Por favor da click en el boton del enlace con el codigo de activacion</strong></p>";
-				$cuerpo.= "<p><strong>Mensaje:</strong></p>";
+				$cuerpo.= "<p><strong><a href='usuario.php?u=".$usuario['Email']."&k=$activacion&action=activeUser'</strong></p>";
 
 				//3) Construir la cabecera del email
 				$cabecera = "From: contacto@comercioit.com\r\n";
@@ -344,7 +353,7 @@ include("conexion.php");
 
 				$destinatario = $usuario['Email'];
 
-				$asunto = "Contacto desde ComercioIT";
+				$asunto = "Activacion de cuenta";
 
 				//4) Enviar el email
 				if ( mail($destinatario, $asunto, $cuerpo, $cabecera) === true ) {
@@ -354,11 +363,13 @@ include("conexion.php");
 					//echo "E-Mail no enviado";
 					header("location: ./?page=registro&rta=0x015");
 				}
+			} else {
+				header("location: ./?page=registro&rta=0x015");
 			}
+
 		} else {
-			header("location: ./?page=registro&rta=0x015");
+			activarUsuario($email);
 		}
-		header("location: " . BACK_END_URL . "/?rta=" . $rta);
 	}
 
 	function validacionUsuario($email){
@@ -376,5 +387,18 @@ include("conexion.php");
 		} 
 
 		return NULL;
+	}
+
+	function activarUsuario($email){
+		global $conexion;
+
+		$usuario = $conexion -> prepare("UPDATE usuarios SET Estado = 1 WHERE Email = :email");
+		$usuario -> bindValue(":email", $email);
+
+		if($usuario -> execute()){
+			echo "Usuario activado";
+		} else {
+			echo "Problema con la base de datos";
+		}
 	}
 ?>
