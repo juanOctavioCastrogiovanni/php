@@ -36,7 +36,7 @@
 							<?php
 								session_start();
 
-								if(isset($_SESSION)){
+								if(isset($_SESSION)&&count($_SESSION)>0){
 									echo "<li><a href='admin/?page=panel'>Bienvenido ".$_SESSION['Nombre']."</a></li>&nbsp;|&nbsp;";
 									echo "<li><a href='admin/?page=usuario&exit=exit'>CERRAR SESION</a></li>";
 								} else {

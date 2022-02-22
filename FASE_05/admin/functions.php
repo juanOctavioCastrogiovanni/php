@@ -404,7 +404,12 @@ include("conexion.php");
 			$usuarios = $listaUsuarios -> fetchAll();
 			foreach($usuarios as $usuario){
 				if($usuario['Email'] == $email&&$contrasenia){
-					return validaContrasenia($usuario['pass'],$contrasenia) ? TRUE : FALSE;
+					if (validarContrasenia($usuario['Pass'],$contrasenia)&&$usuario['Estado']==1){
+						crearSesion($usuario['Nombre'],$usuario['Apellido'],$usuario['Email']);
+						return TRUE;
+					} else {
+						return FALSE;
+					}
 				} else if ($usuario['Email'] == $email){
 					return TRUE;
 				}
@@ -416,6 +421,8 @@ include("conexion.php");
 		return NULL;
 	}
 
+	// castropedro@hotmail.com
+	// 123456
 	function activarUsuario($email){
 		global $conexion;
 
@@ -429,7 +436,7 @@ include("conexion.php");
 		return FALSE;
 	}
 
-	function iniciarSecion($email,$contrasenia){
+	function iniciarSesion($email,$contrasenia){
 		return validacionUsuario($email,$contrasenia);
 	}
 
@@ -439,7 +446,7 @@ include("conexion.php");
 		} 
 	}
 
-	function crearSession($nombre,$apellido,$email){
+	function crearSesion($nombre,$apellido,$email){
 		session_start();
         $_SESSION['Nombre'] = $nombre; 
         $_SESSION['Apellido'] = $apellido; 
