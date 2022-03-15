@@ -1,4 +1,37 @@
-	<!-- PRODUCTOS DESTACADOS -->
+<?php
+	include "./Class/Producto.class.php";
+	include "./admin/conexion.php";
+
+	$stmt = $conexion -> prepare("SELECT * FROM productos LIMIT 6");
+	$stmt->execute();
+	$i=0;
+	$productosArray = array();
+
+	while($productos = $stmt->fetch(PDO::FETCH_ASSOC)){
+		array_push($productosArray,new Producto($productos['idProducto'],$productos['Nombre'],$productos['Precio'],$productos['Marca'],$productos['imagen']));
+	}
+
+	// echo "<pre>";
+	// var_dump($productosArray);
+	// echo "</pre>";
+	// die();
+
+	// $query = $conexion->query("SELECT P.idProducto, P.Nombre, P.Precio, P.Imagen, M.Nombre AS Marca FROM productos AS P INNER JOIN marcas AS M ON M.idMarca = P.Marca WHERE P.Destacado = 1 LIMIT 0, 6");
+	
+	// $productosDestacados = array();
+
+	// foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $registro) {
+		
+	// 	$producto = new Producto($registro["idProducto"], $registro["Nombre"], $registro["Precio"], $registro["Marca"], $registro["Imagen"]);
+
+	// 	print_r( $producto );
+
+	// 	array_push($productosDestacados, $producto);
+	// }
+
+?>
+
+<!-- PRODUCTOS DESTACADOS -->
 	<div class="shoes-grid">
 		<div class="products">
 			<h5 class="latest-product">PRODUCTOS DESTACADOS</h5>
