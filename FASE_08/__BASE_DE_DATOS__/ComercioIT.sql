@@ -1,4 +1,4 @@
--- phpMyAdmin SQL Dump
+﻿-- phpMyAdmin SQL Dump
 -- version 4.5.1
 -- http://www.phpmyadmin.net
 --
@@ -92,21 +92,22 @@ CREATE TABLE `productos` (
   `Categoria` int(11) NOT NULL,
   `Presentacion` varchar(30) NOT NULL,
   `Stock` int(6) NOT NULL,
-  `Imagen` tinytext
+  `Imagen` tinytext,
+  `Destacado` int(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`idProducto`, `Nombre`, `Precio`, `Marca`, `Categoria`, `Presentacion`, `Stock`, `Imagen`) VALUES
-(1, 'iPhone 6', 499.99, 1, 2, '16GB', 500, 'P001.jpg'),
-(2, 'iPad Pro', 599.99, 1, 3, '32GB', 300, 'P002.jpg'),
-(3, 'Nexus 7', 299.99, 6, 3, '32GB', 300, 'P003.jpg'),
-(4, 'Galaxy S7', 459.9, 2, 2, '64GB', 650, 'P004.jpg'),
-(5, 'Moto G', 489.99, 5, 2, '8GB', 750, 'P005.jpg'),
-(6, 'L40', 199.69, 4, 2, '24GB', 350, 'P006.jpg'),
-(7, 'Prueba', 9999.99, 2, 2, 'Prueba', 99, 'screencapture-localhost-phpmyadmin-tbl_structure-php-1479091694893.png');
+INSERT INTO `productos` (`idProducto`, `Nombre`, `Precio`, `Marca`, `Categoria`, `Presentacion`, `Stock`, `Imagen`,`Destacado`) VALUES
+(1, 'iPhone 6', 499.99, 1, 2, '16GB', 500, 'P001.jpg',1),
+(2, 'iPad Pro', 599.99, 1, 3, '32GB', 300, 'P002.jpg',1),
+(3, 'Nexus 7', 299.99, 6, 3, '32GB', 300, 'P003.jpg',1),
+(4, 'Galaxy S7', 459.9, 2, 2, '64GB', 650, 'P004.jpg',1),
+(5, 'Moto G', 489.99, 5, 2, '8GB', 750, 'P005.jpg',1),
+(6, 'L40', 199.69, 4, 2, '24GB', 350, 'P006.jpg',1),
+(7, 'Prueba', 9999.99, 2, 2, 'Prueba', 99, 'screencapture-localhost-phpmyadmin-tbl_structure-php-1479091694893.png',0);
 
 -- --------------------------------------------------------
 
